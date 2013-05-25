@@ -1,11 +1,11 @@
 # require 'rails'
 
 class AjaxDatatablesRails
-  
+
   class MethodError < StandardError; end
 
-  VERSION = '0.0.2'
-    
+  VERSION = '0.0.3'
+
   attr_reader :columns, :model_name, :searchable_columns
 
   def initialize(view)
@@ -18,14 +18,14 @@ class AjaxDatatablesRails
 
   def as_json(options = {})
     {
-      sEcho: params[:sEcho].to_i,
-      iTotalRecords: @model_name.count,
-      iTotalDisplayRecords: filtered_record_count,
-      aaData: data
+        sEcho: params[:sEcho].to_i,
+        iTotalRecords: @model_name.count,
+        iTotalDisplayRecords: filtered_record_count,
+        aaData: data
     }
   end
 
-private
+  private
 
   def data
     raise MethodError, "The method `data' is not defined."
@@ -38,13 +38,13 @@ private
   def filtered_record_count
     search_records(get_raw_records).count
   end
-  
+
   def fetch_records
     search_records(sort_records(paginate_records(get_raw_records)))
   end
 
   def paginate_records(records)
-    records.offset((page - 1) * per_page).limit(per_page)
+    per_page == -1 ? records : records.offset((page - 1) * per_page).limit(per_page)
   end
 
   def sort_records(records)
@@ -62,11 +62,11 @@ private
   end
 
   def page
-    params[:iDisplayStart].to_i/per_page + 1
+    per_page == -1 ? 1 : params[:iDisplayStart].to_i/per_page + 1
   end
 
   def per_page
-    params[:iDisplayLength].to_i > 0 ? params[:iDisplayLength].to_i : 10
+    params[:iDisplayLength].to_i == 0 ? 10 : params[:iDisplayLength].to_i
   end
 
   def sort_column
