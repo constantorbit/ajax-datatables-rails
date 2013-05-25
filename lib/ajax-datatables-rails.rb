@@ -48,7 +48,7 @@ private
   end
 
   def sort_records(records)
-    records.order("#{sort_column} #{sort_direction}")
+    sort_column ? records.order("#{sort_column} #{sort_direction}") : records
   end
 
   def search_records(records)
